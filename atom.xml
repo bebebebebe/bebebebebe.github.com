@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
+  <title><![CDATA[Be.]]></title>
   <link href="http://bebebebebe.github.io/atom.xml" rel="self"/>
   <link href="http://bebebebebe.github.io/"/>
-  <updated>2013-05-03T16:49:26-04:00</updated>
+  <updated>2013-05-03T17:13:07-04:00</updated>
   <id>http://bebebebebe.github.io/</id>
   <author>
     <name><![CDATA[Be]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[title]]></title>
+    <title type="html"><![CDATA[Title...]]></title>
     <link href="http://bebebebebe.github.io/blog/2013/05/02/title/"/>
     <updated>2013-05-02T11:26:00-04:00</updated>
     <id>http://bebebebebe.github.io/blog/2013/05/02/title</id>
