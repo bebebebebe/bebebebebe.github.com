@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "title"
+title: "Title"
 date: 2013-05-02 11:26
 comments: true
 categories: 
