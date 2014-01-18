@@ -4,7 +4,7 @@
   <title><![CDATA[Be.]]></title>
   <link href="http://bebebebebe.github.io/atom.xml" rel="self"/>
   <link href="http://bebebebebe.github.io/"/>
-  <updated>2013-05-04T14:11:16-04:00</updated>
+  <updated>2014-01-18T11:29:27-05:00</updated>
   <id>http://bebebebebe.github.io/</id>
   <author>
     <name><![CDATA[Be]]></name>
@@ -12,14 +12,5 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Title...]]></title>
-    <link href="http://bebebebebe.github.io/blog/2013/05/02/title/"/>
-    <updated>2013-05-02T11:26:00-04:00</updated>
-    <id>http://bebebebebe.github.io/blog/2013/05/02/title</id>
-    <content type="html"><![CDATA[
-]]></content>
-  </entry>
   
 </feed>
