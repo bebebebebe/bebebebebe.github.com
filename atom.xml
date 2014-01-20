@@ -4,7 +4,7 @@
   <title><![CDATA[Be.]]></title>
   <link href="http://bebebebebe.github.io/atom.xml" rel="self"/>
   <link href="http://bebebebebe.github.io/"/>
-  <updated>2014-01-20T18:33:13-05:00</updated>
+  <updated>2014-01-20T18:37:59-05:00</updated>
   <id>http://bebebebebe.github.io/</id>
   <author>
     <name><![CDATA[Be]]></name>
@@ -50,7 +50,7 @@
 
 <p>We&#8217;d eventually decided to use Handlebars, and in my example Node apps I&#8217;d learned how to include Handlebars in a Node app, and that when rendering a file Handlebars automatically looks for a layout file in a views directory. After this setup, I got to work refactoring the code for the main stats view.</p>
 
-<p>Instead of the main stats view, let&#8217;s look at one of the simpler pages.  The <a href=''>crashers</a> view is just a list.  Here&#8217;s the function that gets called when this page is requested:</p>
+<p>Instead of the main stats view, let&#8217;s look at one of the simpler pages.  The <a href='http://parsoid.wmflabs.org:8001/crashers'>crashers</a> view is just a list.  Here&#8217;s the function that gets called when this page is requested:</p>
 
 <figure class='code'><figcaption><span>JavaScript with HTML mixed in</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
