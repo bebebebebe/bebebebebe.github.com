@@ -1,0 +1,149 @@
+---
+layout: post
+title: "First open source contributions!"
+date: 2014-01-18 12:46
+comments: true
+categories: opw
+published: true
+---
+
+I'm doing an <a href='https://wiki.gnome.org/OutreachProgramForWomen'>OPW internship</a> at Wikimedia, and last week my first patches were merged in.
+
+My project is part of Wikimedia's Parsoid, which translates back and forth between wikitext (the markup language Wikipedia is written in) and HTML.  The testing framework translates a bunch of articles from wikitext to HTML and back to wikitext, and then uses diffs to compare the results with the original articles.  You can see test outcomes <a href='http://parsoid.wmflabs.org:8001/'>here</a>. You may notice that some of the views aren't very informative, for example the <a href='http://parsoid.wmflabs.org:8001/perfstats'>performance stats view</a>.  I'm going to make some UI improvements, including data visualizations.
+
+I'm starting[^1] by using templates to separate out the parts of the code responsible only for presentation. <a href='https://github.com/wikimedia/mediawiki-services-parsoid/blob/cc4483b83fca5163b100d33bc357070cae2b3e0c/tests/server/server.js'>Here</a> is the code I started with. While I could readily see that it mixed HTML in with JavaScript, at the start of the project it wasn't obvious to me what was going on in the file: I'd never used <a href='http://nodejs.org/'>Node</a> (and the project is a Node app), had almost no experience with templating, and this was the first time I'd be understanding and making a contribution to a larger code base written by other people.
+
+<!-- more -->
+
+##Isolating
+Besides talking to my mentors about the roles of different files and function of Parsoid, I found it helpful to isolate aspects of the project that were new to me (templating, Node, and making a patch at all).
+
+* **Templating.**  Since I knew I'd be using templates to refactor code, just before the internship started I decided to use <a href='http://handlebarsjs.com/'>Handlebars</a> templates to refactor my personal projects page, which <a href='https://gist.github.com/bebebebebe/8514414'>was</a> a simple list of project descriptions with links to code. I separated <a href='https://github.com/bebebebebe/projects/blob/gh-pages/index.html'>layout</a> from <a href='https://github.com/bebebebebe/projects/blob/gh-pages/project_data.js'>data</a>, which made it easier to make UI improvements. <a href='http://bebebebebe.github.io/projects/'>Here</a>'s the result (now with rollover thumbnail images!).
+
+* **Node apps.**  Starting with tutorials, I made a bunch of small Node example apps, trying out templating systems in most of them. (If you're also getting started with Node, I found this introductory <a href='http://debuggable.com/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb'>post</a> and this <a href='http://www.nodebeginner.org/'>tutorial</a> good starting points.) Last Sunday afternoon I met up with a Hacker School friend to work on turning one of my tutorial examples into a to do app for multiple users with a MySQL database.
+
+* **Making a patch.** Parsoid's repo had been recently reorganized and moved, but I noticed that the Readme's hadn't been updated to reflect this. Making these small updates was a good way to get used to Wikimedia's code review tool (Gerrit), learning how to make a patch, request reviewers, interact with comments, amend the patch, and finally see it <a href='https://gerrit.wikimedia.org/r/#/c/106539/'>merged</a> in to the code base.
+
+```
+jenkins-bot   Jan 9 12:38 PM
+Change has been successfully merged into the git repository.
+```
+
+##Back to Parsoid
+Now the <a href='https://github.com/wikimedia/mediawiki-services-parsoid/blob/cc4483b83fca5163b100d33bc357070cae2b3e0c/tests/server/server.js'>code</a> I was going to template made a lot more sense. I could see where it made a connection to a MySQL database, defined SQL queries to be used in callback functions, defined callback functions to be called when requests are made, created an app, and routed HTTP requests.
+
+We'd eventually decided to use Handlebars, and in my example Node apps I'd learned how to include Handlebars in a Node app, and that when rendering a file Handlebars automatically looks for a layout file in a views directory. After this setup, I got to work refactoring the code for the main stats view.
+
+Instead of the main stats view, let's look at one of the simpler pages.  The <a href=''>crashers</a> view is just a list.  Here's the function that gets called when this page is requested:
+
+``` javascript JavaScript with HTML mixed in
+var GET_crashers = function( req, res ) {
+  var cutoffDate = new Date( Date.now() - ( cutOffTime * 1000 ) );
+  db.query( dbCrashers, [ maxTries, cutoffDate ], function ( err, rows ) {
+    if ( err ) {
+      console.error( err );
+      res.send( err.toString(), 500 );
+    } else {
+      var n = rows.length;
+      res.setHeader( 'Content-Type', 'text/html; charset=UTF-8' );
+      res.status( 200 );
+      res.write( '<html><body>' );
+      if (n === 0) {
+        res.write( 'No titles crash the testers!  All\'s well with the world!' );
+      } else {
+        res.write( '<h1> The following ' + n + ' titles crash the testers' +
+                  ' at least ' + maxTries + ' times</h1>' );
+        res.write( '<ul>' );
+        for ( var i = 0; i < n; i++ ) {
+          var prefix = rows[i].prefix,
+            title = rows[i].title;
+          var url = prefix.replace( /wiki$/, '' ) + '.wikipedia.org/wiki/' + title;
+          var name = prefix + ':' + title;
+          var commitHash = rows[i].claim_hash;
+          res.write( '<li>' + commitHash + ': <a href="http://' +
+                encodeURI(url).replace('&', '&amp;') + '">' +
+                name.replace('&', '&amp;') + '</a></li>\n' );
+        }
+        res.write( '</ul>' );
+      }
+      res.end( '</body></html>' );
+    }
+  } );
+};
+```
+You can see that HTML is sprinkled throughout (look at the lines starting ```res.write```).  As you can see on line 12, we have to render the page differently if ```n === 0``` (that is, if the database query returns no rows, which means no titles crashed the testers).  We can get rid of lines 9, 11 and 30, as they are already taken care of in the layout view.  We want a template that we can also use in a similar <a href='http://parsoid.wmflabs.org:8001/failedFetches'>view</a>.   So:
+{% raw %}
+``` html list.html (Handlebars template for list views)
+{{#if alt}}
+  <h1>{{heading}}</h1>
+{{else}}
+  <h1>{{heading}}</h1>
+  <ul>
+    {{#each items}}
+      <li>
+        {{#if description}}
+          {{description}}:
+        {{/if}}
+        <a href='{{formatUrl url}}'>{{linkName}}</a>
+      </li>
+    {{/each}}
+  </ul>
+{{/if}}
+```
+{% endraw %}
+
+Now we can bind this template to data to render our view, like so:
+``` javascript
+res.render('list.html', data);
+```
+All that remains is to refactor our GET_crashers function to get rid of the HTML, and define ```data``` (lines 14-30 are responsible for this):
+
+``` javascript refactored JavaScript, HTML free!
+var GET_crashers = function( req, res ) {
+  var cutoffDate = new Date( Date.now() - ( cutOffTime * 1000 ) );
+  db.query( dbCrashers, [ maxTries, cutoffDate ], function ( err, rows ) {
+    if ( err ) {
+      console.error( err );
+      res.send( err.toString(), 500 );
+    } else {
+      res.status( 200 );
+      var n = rows.length;
+      var pageData = [];
+      for (var i = 0; i < n; i++) {
+        var prefix = rows[i].prefix,
+          title = rows[i].title;
+        pageData.push({
+          description: rows[i].claim_hash,
+          url: prefix.replace( /wiki$/, '' ) + '.wikipedia.org/wiki/' + title,
+          linkName: prefix + ':' + title
+        });
+      }
+      var heading = n === 0 ? 'No titles crash the testers! All\'s well with the world!' :
+        'The following ' + n + ' titles crash the testers at least ' +
+        maxTries + ' times ';
+      var data = {
+        alt: n === 0,
+        heading: heading,
+        items: pageData
+      };
+      hbs.registerHelper('formatUrl', function (url) {
+        return 'http://' + encodeURI(url).replace('&', '&amp;');
+      });
+      res.render('list.html', data);
+    }
+  } );
+};
+```
+And that's all! Now with the data and logic separated from the HTML presentation, it will be much easier to make UI changes.
+
+##Complications...
+I actually started with the main stats view before the simpler crashers view we just looked at.  I had to amend my first code patch several times before it was merged in.  I hadn't thought about hard tabs vs spaces for indentation, had left some trailing whitespace here and there, and had failed to take into account that the remote version of the code had changed during the time that I'd been working on it locally.
+
+Resolving these issues, I learned about git, discovered some useful Sublime text plugins for <a href='https://github.com/uipoet/sublime-jshint'>JavaScript style</a> and for <a href='https://github.com/SublimeText/TrailingSpaces'>trailing whitespace</a>, and looked at the Parsoid team's new <a href='https://www.mediawiki.org/wiki/Parsoid/Style_guide'>style guide</a>, with an indentation rule that charmingly asserts of itself that the team does not prefer it.
+
+##Getting faster
+In Wikimedia's <a href='https://www.youtube.com/watch?v=YD6Tn07FxD0'>Monthly Metrics Meeting</a>, I heard about Google Code In, a program that Wikimedia participated in that gets high school students involved in open source.  Over seven weeks, students work on completing small coding tasks, tasks that might take an experienced developer 1-2 hours to complete.  Towards the beginning of program, students would take 3-5 days to complete a task.  But as they gained experience they got faster, and by the end of the seven weeks some students were completing tasks faster than experienced developers.
+
+My patches are going more smoothly too, as I wrap up the templating part of the project.
+
+[^1]: Actually this isn't quite the start of my project, as I started by doing research and test cases for DOM-based temlating systems; but that's out of the scope of this post's narrative!
