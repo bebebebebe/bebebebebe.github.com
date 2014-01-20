@@ -1,0 +1,106 @@
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">statsWebInterface</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">res</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">query</span><span class="p">,</span> <span class="nx">queryParams</span><span class="p">,</span> <span class="nx">prefix</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">cutoffDate</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span> <span class="nx">cutOffTime</span> <span class="o">*</span> <span class="mi">1000</span> <span class="p">)</span> <span class="p">);</span>
+
+  <span class="kd">var</span> <span class="nx">displayRow</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">label</span><span class="p">,</span> <span class="nx">val</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// round numeric data, but ignore others</span>
+      <span class="k">if</span><span class="p">(</span> <span class="o">!</span><span class="nb">isNaN</span><span class="p">(</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span> <span class="nx">val</span> <span class="o">*</span> <span class="mi">100</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span> <span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">val</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span> <span class="nx">val</span> <span class="o">*</span> <span class="mi">100</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;tr style=&quot;font-weight:bold&quot;&gt;&lt;td style=&quot;padding-left:20px;&quot;&gt;&#39;</span> <span class="o">+</span> <span class="nx">label</span> <span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="nx">prefix</span> <span class="o">!==</span> <span class="kc">null</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39; (&#39;</span> <span class="o">+</span> <span class="nx">prefix</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span> <span class="p">);</span>
+      <span class="p">}</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;/td&gt;&lt;td style=&quot;padding-left:20px; text-align:right&quot;&gt;&#39;</span> <span class="o">+</span> <span class="nx">val</span> <span class="o">+</span> <span class="s1">&#39;&lt;/td&gt;&lt;/tr&gt;&#39;</span> <span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="nx">prefix</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">||</span> <span class="kc">null</span><span class="p">;</span>
+
+  <span class="c1">// Switch the query object based on the prefix</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="nx">prefix</span> <span class="o">!==</span> <span class="kc">null</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">query</span> <span class="o">=</span> <span class="nx">dbPerWikiStatsQuery</span><span class="p">;</span>
+    <span class="nx">queryParams</span> <span class="o">=</span> <span class="p">[</span> <span class="nx">prefix</span><span class="p">,</span> <span class="nx">prefix</span><span class="p">,</span> <span class="nx">prefix</span><span class="p">,</span> <span class="nx">prefix</span><span class="p">,</span>
+                    <span class="nx">prefix</span><span class="p">,</span> <span class="nx">prefix</span><span class="p">,</span> <span class="nx">prefix</span><span class="p">,</span> <span class="nx">prefix</span><span class="p">,</span>
+                    <span class="nx">prefix</span><span class="p">,</span> <span class="nx">maxTries</span><span class="p">,</span> <span class="nx">cutoffDate</span> <span class="p">];</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">query</span> <span class="o">=</span> <span class="nx">dbStatsQuery</span><span class="p">;</span>
+    <span class="nx">queryParams</span> <span class="o">=</span> <span class="p">[</span> <span class="nx">maxTries</span><span class="p">,</span> <span class="nx">cutoffDate</span> <span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Fetch stats for commit</span>
+  <span class="nx">db</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span> <span class="nx">query</span><span class="p">,</span> <span class="nx">queryParams</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">row</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nx">err</span> <span class="o">||</span> <span class="o">!</span><span class="nx">row</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="s2">&quot;Stats query returned nothing!&quot;</span><span class="p">;</span>
+      <span class="nx">msg</span> <span class="o">=</span> <span class="nx">err</span> <span class="o">?</span> <span class="nx">msg</span> <span class="o">+</span> <span class="s2">&quot;\n&quot;</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">:</span> <span class="nx">msg</span><span class="p">;</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s2">&quot;Error: &quot;</span> <span class="o">+</span> <span class="nx">msg</span><span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span> <span class="nx">msg</span><span class="p">,</span> <span class="mi">500</span> <span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span> <span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;text/html; charset=UTF-8&#39;</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span> <span class="mi">200</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;html&gt;&lt;body&gt;&#39;</span> <span class="p">);</span>
+
+      <span class="kd">var</span> <span class="nx">tests</span> <span class="o">=</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">total</span><span class="p">,</span>
+      <span class="nx">errorLess</span> <span class="o">=</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">no_errors</span><span class="p">,</span>
+      <span class="nx">skipLess</span> <span class="o">=</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">no_skips</span><span class="p">,</span>
+      <span class="nx">numRegressions</span> <span class="o">=</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">numregressions</span><span class="p">,</span>
+      <span class="nx">numFixes</span> <span class="o">=</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">numfixes</span><span class="p">,</span>
+      <span class="nx">noErrors</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">*</span> <span class="nx">errorLess</span> <span class="o">/</span> <span class="p">(</span> <span class="nx">tests</span> <span class="o">||</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>
+      <span class="nx">perfects</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span> <span class="mi">100</span><span class="o">*</span> <span class="mi">100</span> <span class="o">*</span> <span class="nx">skipLess</span> <span class="o">/</span> <span class="p">(</span> <span class="nx">tests</span> <span class="o">||</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>
+      <span class="nx">syntacticDiffs</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">*</span>
+        <span class="p">(</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">no_fails</span> <span class="o">/</span> <span class="p">(</span> <span class="nx">tests</span> <span class="o">||</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">;</span>
+
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;p&gt;We have run roundtrip-tests on &lt;b&gt;&#39;</span> <span class="o">+</span>
+        <span class="nx">tests</span> <span class="o">+</span>
+        <span class="s1">&#39;&lt;/b&gt; articles, of which &lt;ul&gt;&lt;li&gt;&lt;b&gt;&#39;</span> <span class="o">+</span>
+        <span class="nx">noErrors</span> <span class="o">+</span>
+        <span class="s1">&#39;%&lt;/b&gt; parsed without errors &lt;/li&gt;&lt;li&gt;&lt;b&gt;&#39;</span> <span class="o">+</span>
+        <span class="nx">syntacticDiffs</span> <span class="o">+</span>
+        <span class="s1">&#39;%&lt;/b&gt; round-tripped without semantic differences, and &lt;/li&gt;&lt;li&gt;&lt;b&gt;&#39;</span> <span class="o">+</span>
+        <span class="nx">perfects</span> <span class="o">+</span>
+        <span class="s1">&#39;%&lt;/b&gt; round-tripped with no character differences at all.&lt;/li&gt;&#39;</span> <span class="o">+</span>
+        <span class="s1">&#39;&lt;/ul&gt;&lt;/p&gt;&#39;</span> <span class="p">);</span>
+
+      <span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">800</span><span class="p">;</span>
+
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;table&gt;&lt;tr height=60px&gt;&#39;</span><span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;td width=&#39;</span> <span class="o">+</span>
+          <span class="p">(</span> <span class="nx">width</span> <span class="o">*</span> <span class="nx">perfects</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">||</span> <span class="mi">0</span> <span class="p">)</span> <span class="o">+</span>
+          <span class="s1">&#39;px style=&quot;background:green&quot; title=&quot;Perfect / no diffs&quot;&gt;&lt;/td&gt;&#39;</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;td width=&#39;</span> <span class="o">+</span>
+          <span class="p">(</span> <span class="nx">width</span> <span class="o">*</span> <span class="p">(</span> <span class="nx">syntacticDiffs</span> <span class="o">-</span> <span class="nx">perfects</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">||</span> <span class="mi">0</span> <span class="p">)</span> <span class="o">+</span>
+          <span class="s1">&#39;px style=&quot;background:yellow&quot; title=&quot;Syntactic diffs&quot;&gt;&lt;/td&gt;&#39;</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;td width=&#39;</span> <span class="o">+</span>
+          <span class="p">(</span> <span class="nx">width</span> <span class="o">*</span> <span class="p">(</span> <span class="mi">100</span> <span class="o">-</span> <span class="nx">syntacticDiffs</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">||</span> <span class="mi">0</span> <span class="p">)</span> <span class="o">+</span>
+          <span class="s1">&#39;px style=&quot;background:red&quot; title=&quot;Semantic diffs&quot;&gt;&lt;/td&gt;&#39;</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;/tr&gt;&lt;/table&gt;&#39;</span> <span class="p">);</span>
+
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;p&gt;Latest revision:&#39;</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;table&gt;&lt;tbody&gt;&#39;</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Git SHA1&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">maxhash</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Test Results&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">maxresults</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span> <span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Crashers&quot;</span><span class="p">,</span>
+                 <span class="s1">&#39;&lt;a href=&quot;/crashers&quot;&gt;&#39;</span> <span class="o">+</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">crashers</span> <span class="o">+</span> <span class="s1">&#39;&lt;/a&gt;&#39;</span> <span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Regressions&quot;</span><span class="p">,</span>
+                 <span class="s1">&#39;&lt;a href=&quot;/regressions/between/&#39;</span> <span class="o">+</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">secondhash</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span>
+                 <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">maxhash</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span> <span class="o">+</span>
+                 <span class="nx">numRegressions</span> <span class="o">+</span> <span class="s1">&#39;&lt;/a&gt;&#39;</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Fixes&quot;</span><span class="p">,</span>
+                 <span class="s1">&#39;&lt;a href=&quot;/topfixes/between/&#39;</span> <span class="o">+</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">secondhash</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span>
+                 <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">maxhash</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span> <span class="o">+</span>
+                 <span class="nx">numFixes</span> <span class="o">+</span> <span class="s1">&#39;&lt;/a&gt;&#39;</span><span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;/tbody&gt;&lt;/table&gt;&lt;/p&gt;&#39;</span> <span class="p">);</span>
+
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;p&gt;Averages (over the latest results):&#39;</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;table&gt;&lt;tbody&gt;&#39;</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Errors&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">avgerrors</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Fails&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">avgfails</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Skips&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">avgskips</span><span class="p">);</span>
+      <span class="nx">displayRow</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="s2">&quot;Score&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">avgscore</span><span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="s1">&#39;&lt;/tbody&gt;&lt;/table&gt;&lt;/p&gt;&#39;</span> <span class="p">);</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span> <span class="nx">indexLinkList</span><span class="p">()</span> <span class="p">);</span>
+
+      <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span> <span class="s1">&#39;&lt;/body&gt;&lt;/html&gt;&#39;</span> <span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</pre></div>
