@@ -4,7 +4,7 @@
   <title><![CDATA[Category: opw | Be.]]></title>
   <link href="http://bebebebebe.github.io/blog/categories/opw/atom.xml" rel="self"/>
   <link href="http://bebebebebe.github.io/"/>
-  <updated>2014-02-16T23:43:10-05:00</updated>
+  <updated>2014-02-16T23:46:09-05:00</updated>
   <id>http://bebebebebe.github.io/</id>
   <author>
     <name><![CDATA[Be]]></name>
@@ -78,7 +78,7 @@ git review -R
 This pushes changes to Gerrit, the code review tool that Wikimedia uses.</p></li>
 <li><h2>Alter the patch</h2>
 
-<p>If I want to change the patch I've pushed to Gerrit (say, after code review), I can continue working on the branch you pushed from, and proceed as above except committing with <strong>--amend</strong>:
+<p>If I want to change the patch I've pushed to Gerrit (say, after code review), I can continue working on the branch MyNewBranchName and proceed as above except committing with <strong>--amend</strong>:
 <code>
 git commit --amend
 </code></p></li>
