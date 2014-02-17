@@ -4,7 +4,7 @@
   <title><![CDATA[Be.]]></title>
   <link href="http://bebebebebe.github.io/atom.xml" rel="self"/>
   <link href="http://bebebebebe.github.io/"/>
-  <updated>2014-02-15T19:46:09-05:00</updated>
+  <updated>2014-02-16T23:43:10-05:00</updated>
   <id>http://bebebebebe.github.io/</id>
   <author>
     <name><![CDATA[Be]]></name>
@@ -12,6 +12,150 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Git/Gerrit Workflow]]></title>
+    <link href="http://bebebebebe.github.io/blog/2014/02/16/git-slash-gerrit-workflow/"/>
+    <updated>2014-02-16T21:41:00-05:00</updated>
+    <id>http://bebebebebe.github.io/blog/2014/02/16/git-slash-gerrit-workflow</id>
+    <content type="html"><![CDATA[<p>These are the Git commands I find myself using the most while working on my OPW project, and what they mean. This post is mostly for my reference, so I don&#8217;t have to keep looking up the same things in Wikimedia&#8217;s <a href='http://www.mediawiki.org/wiki/Gerrit/Tutorial'>Gerrit Tutorial</a>, and in <a href='http://git-scm.com/book/en/'>the Git book</a>.</p>
+
+<ul>
+<li><h2>Update my local master branch</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git pull origin master</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This updates my local master branch so that it&#8217;s the same as origin (the remote that it was cloned from). <strong>Git pull</strong> <strong>fetches</strong> any new commits from the remote, and <strong>merges</strong> them into the local master branch. The merge involves &#8221;<strong>fast-forwarding</strong>,&#8221; which means the pointer in my local master branch is moved to the latest fetched commit.</p>
+
+<!-- more -->
+
+
+<ul>
+<li><h2>Create a new branch</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git co -b MyNewBranchName origin/master</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here co is an alias for checkout, and the command is short for:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git branch MyNewBranchName --track origin/master
+</span><span class='line'>git checkout MyNewBranchName</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Git branch</strong> MyNewBranchName creates a new branch named &#8216;MyNewBranchName.&#8217; And <strong>&#8211;track origin/master</strong> sets up a <strong>push/pull</strong> relationship with the origin/master branch. This means that when I use the push or pull command on my new branch, I&#8217;ll be pushing or pulling to the master branch of the remote my repo was cloned from. Finally, <strong>git checkout</strong> switches me to my new branch.</p>
+
+<ul>
+<li><h2>Check and commit changes</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git status</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tells me which files I&#8217;ve added or modified since the last commit.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git diff</span></code></pre></td></tr></table></div></figure>
+
+
+<p>shows me how I&#8217;ve modified the modified files, and points out trailing/extra whitespace.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git add FILENAME</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tells Git to commit changes to the file named &#8216;FILENAME&#8217; in the next commit. And</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git commit -m 'CommitMessageHere'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>makes a commit.</p>
+
+<ul>
+<li><h2>Synch up with remote</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git pull --rebase</span></code></pre></td></tr></table></div></figure>
+
+
+<p>While I&#8217;ve been working on my new branch, others may have pushed changes to the remote. <strong>git pull &#8211;rebase</strong> fetches new commits from the remote, and replays them on my local branch. <a href='http://git-scm.com/book/en/'>Here</a>&#8217;s how it works:</p>
+
+<blockquote><p>It works by going to the common ancestor of the two branches (the one you’re on and the one you’re rebasing onto), getting the diff introduced by each commit of the branch you’re on, saving those diffs to temporary files, resetting the current branch to the same commit as the branch you are rebasing onto, and finally applying each change in turn.</p></blockquote>
+
+
+<ul>
+<li><h2>Make a patch</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git review -R</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This pushes changes to Gerrit, the code review tool that Wikimedia uses.</p>
+
+<ul>
+<li><h2>Alter the patch</h2>
+
+<p>If I want to change the patch I&#8217;ve pushed to Gerrit (say, after code review), I can continue working on the branch you pushed from, and proceed as above except committing with <strong>&#8211;amend</strong>:</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git commit --amend</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><h2>Delete the branch</h2>
+
+<p>Once my patch has been merged in, I delete the branch, &#8216;MyNewBranchName,&#8217; that I was working on:</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git co master
+</span><span class='line'>git branch -D MyNewBranchName</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Some mysteries (for now)</h2>
+
+<p>Reminders to look into these things I don&#8217;t understand yet:</p>
+
+<ul>
+<li><p>How does <strong>git review -R</strong> work?</p></li>
+<li><p>Rather than <strong>git pull &#8211;rebase</strong> above, the Gerrit tutorial tells me to use</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git pull origin master
+</span><span class='line'>git rebase master</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;m not sure how this is different, and why I get an error message along the lines of</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>You are about to submit multiple commits. This is expected if you are submitting a commit that is dependent on one or more in-review commits.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>when I do this, but not with <strong>git pull &#8211;rebase</strong>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[First open source contributions!]]></title>

@@ -9,7 +9,7 @@
   <meta name="author" content="Be">
 
   
-  <meta name="description" content="I&#8217;m doing an OPW internship at Wikimedia, and last week my first patches were merged in. My project is part of Wikimedia&#8217;s Parsoid, which &hellip;">
+  <meta name="description" content="These are the Git commands I find myself using the most while working on my OPW project, and what they mean. This post is mostly for my reference, so &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,58 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/02/16/git-slash-gerrit-workflow/">Git/Gerrit Workflow</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-16T21:41:00-05:00" pubdate data-updated="true">Feb 16<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>These are the Git commands I find myself using the most while working on my OPW project, and what they mean. This post is mostly for my reference, so I don&#8217;t have to keep looking up the same things in Wikimedia&#8217;s <a href='http://www.mediawiki.org/wiki/Gerrit/Tutorial'>Gerrit Tutorial</a>, and in <a href='http://git-scm.com/book/en/'>the Git book</a>.</p>
+
+<ul>
+<li><h2>Update my local master branch</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git pull origin master</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This updates my local master branch so that it&#8217;s the same as origin (the remote that it was cloned from). <strong>Git pull</strong> <strong>fetches</strong> any new commits from the remote, and <strong>merges</strong> them into the local master branch. The merge involves &#8221;<strong>fast-forwarding</strong>,&#8221; which means the pointer in my local master branch is moved to the latest fetched commit.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/02/16/git-slash-gerrit-workflow/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -330,6 +382,10 @@ My patches are going more smoothly too, as I wrap up the templating part of the 
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/02/16/git-slash-gerrit-workflow/">Git/Gerrit Workflow</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/18/first-open-source-contributions%21/">First open source contributions!</a>

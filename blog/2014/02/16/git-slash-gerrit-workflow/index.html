@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Git/Gerrit Workflow - Be.</title>
+  <meta name="author" content="Be">
+
+  
+  <meta name="description" content="These are the Git commands I find myself using the most while working on my OPW project, and what they mean. This post is mostly for my reference, so &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://bebebebebe.github.io/blog/2014/02/16/git-slash-gerrit-workflow">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Be." type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Be.</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:bebebebebe.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Git/Gerrit Workflow</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-16T21:41:00-05:00" pubdate data-updated="true">Feb 16<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>These are the Git commands I find myself using the most while working on my OPW project, and what they mean. This post is mostly for my reference, so I don&#8217;t have to keep looking up the same things in Wikimedia&#8217;s <a href='http://www.mediawiki.org/wiki/Gerrit/Tutorial'>Gerrit Tutorial</a>, and in <a href='http://git-scm.com/book/en/'>the Git book</a>.</p>
+
+<ul>
+<li><h2>Update my local master branch</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git pull origin master</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This updates my local master branch so that it&#8217;s the same as origin (the remote that it was cloned from). <strong>Git pull</strong> <strong>fetches</strong> any new commits from the remote, and <strong>merges</strong> them into the local master branch. The merge involves &#8221;<strong>fast-forwarding</strong>,&#8221; which means the pointer in my local master branch is moved to the latest fetched commit.</p>
+
+<!-- more -->
+
+
+<ul>
+<li><h2>Create a new branch</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git co -b MyNewBranchName origin/master</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here co is an alias for checkout, and the command is short for:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git branch MyNewBranchName --track origin/master
+</span><span class='line'>git checkout MyNewBranchName</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Git branch</strong> MyNewBranchName creates a new branch named &#8216;MyNewBranchName.&#8217; And <strong>&#8211;track origin/master</strong> sets up a <strong>push/pull</strong> relationship with the origin/master branch. This means that when I use the push or pull command on my new branch, I&#8217;ll be pushing or pulling to the master branch of the remote my repo was cloned from. Finally, <strong>git checkout</strong> switches me to my new branch.</p>
+
+<ul>
+<li><h2>Check and commit changes</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git status</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tells me which files I&#8217;ve added or modified since the last commit.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git diff</span></code></pre></td></tr></table></div></figure>
+
+
+<p>shows me how I&#8217;ve modified the modified files, and points out trailing/extra whitespace.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git add FILENAME</span></code></pre></td></tr></table></div></figure>
+
+
+<p>tells Git to commit changes to the file named &#8216;FILENAME&#8217; in the next commit. And</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git commit -m 'CommitMessageHere'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>makes a commit.</p>
+
+<ul>
+<li><h2>Synch up with remote</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git pull --rebase</span></code></pre></td></tr></table></div></figure>
+
+
+<p>While I&#8217;ve been working on my new branch, others may have pushed changes to the remote. <strong>git pull &#8211;rebase</strong> fetches new commits from the remote, and replays them on my local branch. <a href='http://git-scm.com/book/en/'>Here</a>&#8217;s how it works:</p>
+
+<blockquote><p>It works by going to the common ancestor of the two branches (the one you’re on and the one you’re rebasing onto), getting the diff introduced by each commit of the branch you’re on, saving those diffs to temporary files, resetting the current branch to the same commit as the branch you are rebasing onto, and finally applying each change in turn.</p></blockquote>
+
+
+<ul>
+<li><h2>Make a patch</h2></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git review -R</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This pushes changes to Gerrit, the code review tool that Wikimedia uses.</p>
+
+<ul>
+<li><h2>Alter the patch</h2>
+
+<p>If I want to change the patch I&#8217;ve pushed to Gerrit (say, after code review), I can continue working on the branch you pushed from, and proceed as above except committing with <strong>&#8211;amend</strong>:</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git commit --amend</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><h2>Delete the branch</h2>
+
+<p>Once my patch has been merged in, I delete the branch, &#8216;MyNewBranchName,&#8217; that I was working on:</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git co master
+</span><span class='line'>git branch -D MyNewBranchName</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Some mysteries (for now)</h2>
+
+<p>Reminders to look into these things I don&#8217;t understand yet:</p>
+
+<ul>
+<li><p>How does <strong>git review -R</strong> work?</p></li>
+<li><p>Rather than <strong>git pull &#8211;rebase</strong> above, the Gerrit tutorial tells me to use</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git pull origin master
+</span><span class='line'>git rebase master</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;m not sure how this is different, and why I get an error message along the lines of</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>You are about to submit multiple commits. This is expected if you are submitting a commit that is dependent on one or more in-review commits.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>when I do this, but not with <strong>git pull &#8211;rebase</strong>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Be</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-16T21:41:00-05:00" pubdate data-updated="true">Feb 16<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/opw/'>opw</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bebebebebe.github.io/blog/2014/02/16/git-slash-gerrit-workflow/" data-via="" data-counturl="http://bebebebebe.github.io/blog/2014/02/16/git-slash-gerrit-workflow/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/01/18/first-open-source-contributions%21/" title="Previous Post: First open source contributions!">&laquo; First open source contributions!</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/02/16/git-slash-gerrit-workflow/">Git/Gerrit Workflow</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/18/first-open-source-contributions%21/">First open source contributions!</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Be -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

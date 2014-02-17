@@ -4,7 +4,7 @@
   <title><![CDATA[Category: opw | Be.]]></title>
   <link href="http://bebebebebe.github.io/blog/categories/opw/atom.xml" rel="self"/>
   <link href="http://bebebebebe.github.io/"/>
-  <updated>2014-02-15T19:46:09-05:00</updated>
+  <updated>2014-02-16T23:43:10-05:00</updated>
   <id>http://bebebebebe.github.io/</id>
   <author>
     <name><![CDATA[Be]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Git/Gerrit Workflow]]></title>
+    <link href="http://bebebebebe.github.io/blog/2014/02/16/git-slash-gerrit-workflow/"/>
+    <updated>2014-02-16T21:41:00-05:00</updated>
+    <id>http://bebebebebe.github.io/blog/2014/02/16/git-slash-gerrit-workflow</id>
+    <content type="html"><![CDATA[<p>These are the Git commands I find myself using the most while working on my OPW project, and what they mean. This post is mostly for my reference, so I don't have to keep looking up the same things in Wikimedia's <a href='http://www.mediawiki.org/wiki/Gerrit/Tutorial'>Gerrit Tutorial</a>, and in <a href='http://git-scm.com/book/en/'>the Git book</a>.</p>
+
+<ul>
+<li><h2>Update my local master branch</h2>
+
+<p><code>
+git pull origin master
+</code>
+This updates my local master branch so that it's the same as origin (the remote that it was cloned from). <strong>Git pull</strong> <strong>fetches</strong> any new commits from the remote, and <strong>merges</strong> them into the local master branch. The merge involves "<strong>fast-forwarding</strong>," which means the pointer in my local master branch is moved to the latest fetched commit.</p></li>
+</ul>
+
+
+<!-- more -->
+
+
+<ul>
+<li><h2>Create a new branch</h2>
+
+<p><code>
+git co -b MyNewBranchName origin/master
+</code>
+Here co is an alias for checkout, and the command is short for:
+<code>
+git branch MyNewBranchName --track origin/master
+git checkout MyNewBranchName
+</code>
+<strong>Git branch</strong> MyNewBranchName creates a new branch named 'MyNewBranchName.' And <strong>--track origin/master</strong> sets up a <strong>push/pull</strong> relationship with the origin/master branch. This means that when I use the push or pull command on my new branch, I'll be pushing or pulling to the master branch of the remote my repo was cloned from. Finally, <strong>git checkout</strong> switches me to my new branch.</p></li>
+<li><h2>Check and commit changes</h2>
+
+<p><code>
+git status
+</code>
+tells me which files I've added or modified since the last commit.
+<code>
+git diff
+</code>
+shows me how I've modified the modified files, and points out trailing/extra whitespace.
+<code>
+git add FILENAME
+</code>
+tells Git to commit changes to the file named 'FILENAME' in the next commit. And
+<code>
+git commit -m 'CommitMessageHere'
+</code>
+makes a commit.</p></li>
+<li><h2>Synch up with remote</h2>
+
+<p><code>
+git pull --rebase
+</code>
+While I've been working on my new branch, others may have pushed changes to the remote. <strong>git pull --rebase</strong> fetches new commits from the remote, and replays them on my local branch. <a href='http://git-scm.com/book/en/'>Here</a>'s how it works:
+<blockquote><p>It works by going to the common ancestor of the two branches (the one you’re on and the one you’re rebasing onto), getting the diff introduced by each commit of the branch you’re on, saving those diffs to temporary files, resetting the current branch to the same commit as the branch you are rebasing onto, and finally applying each change in turn.</p></blockquote></p></li>
+<li><h2>Make a patch</h2>
+
+<p><code>
+git review -R
+</code>
+This pushes changes to Gerrit, the code review tool that Wikimedia uses.</p></li>
+<li><h2>Alter the patch</h2>
+
+<p>If I want to change the patch I've pushed to Gerrit (say, after code review), I can continue working on the branch you pushed from, and proceed as above except committing with <strong>--amend</strong>:
+<code>
+git commit --amend
+</code></p></li>
+<li><h2>Delete the branch</h2>
+
+<p>Once my patch has been merged in, I delete the branch, 'MyNewBranchName,' that I was working on:
+<code>
+git co master
+git branch -D MyNewBranchName
+</code></p></li>
+</ul>
+
+
+<h2>Some mysteries (for now)</h2>
+
+<p>Reminders to look into these things I don't understand yet:</p>
+
+<ul>
+<li><p>How does <strong>git review -R</strong> work?</p></li>
+<li><p>Rather than <strong>git pull --rebase</strong> above, the Gerrit tutorial tells me to use
+<code>
+git pull origin master
+git rebase master
+</code>
+I'm not sure how this is different, and why I get an error message along the lines of
+<code>
+You are about to submit multiple commits. This is expected if you are submitting a commit that is dependent on one or more in-review commits.
+</code>
+when I do this, but not with <strong>git pull --rebase</strong>.</p></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[First open source contributions!]]></title>
